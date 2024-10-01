@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.aulapamfirebase" />
-                  <option name="mobileSdkAppId" value="1:217200969165:android:cc4e7f13269789d761f084" />
-                  <option name="projectId" value="aulapam-54076" />
-                  <option name="projectNumber" value="217200969165" />
+                  <option name="mobileSdkAppId" value="1:815552044760:android:d2035dded2c28ed40301ad" />
+                  <option name="projectId" value="appfirebaseati2" />
+                  <option name="projectNumber" value="815552044760" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

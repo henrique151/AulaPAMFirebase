@@ -1,12 +1,13 @@
 package com.example.aulapamfirebase
 
-import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,7 +16,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.aulapamfirebase.ui.theme.AulaPAMFireBaseTheme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,153 +49,133 @@ fun App(db: FirebaseFirestore) {
     var cidade by remember { mutableStateOf("") }
     var bairro by remember { mutableStateOf("") }
     var cep by remember { mutableStateOf("") }
+    var clientes by remember { mutableStateOf(listOf<HashMap<String, String>>()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
-        
     ) {
+        // Título
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "App Firebase Firestore.",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
                 style = MaterialTheme.typography.headlineLarge
             )
         }
 
+        // Subtítulo
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Henrique Porto de Sousa 3°DS A Manhã",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
                 style = MaterialTheme.typography.headlineMedium
             )
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Nome:",
-                modifier = Modifier
-                    .weight(0.3f)
-            )
-            TextField(
-                value = nome,
-                onValueChange = { nome = it },
-                modifier = Modifier.weight(0.7f)
-            )
-        }
+        // Campos de entrada
+        InputField(label = "Nome:", value = nome) { nome = it }
+        InputField(label = "Telefone:", value = telefone) { telefone = it }
+        InputField(label = "Cidade:", value = cidade) { cidade = it }
+        InputField(label = "Bairro:", value = bairro) { bairro = it }
+        InputField(label = "Cep:", value = cep) { cep = it }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Telefone:",
-                modifier = Modifier.weight(0.3f)
-            )
-            TextField(
-                value = telefone,
-                onValueChange = { telefone = it },
-                modifier = Modifier.weight(0.7f)
-            )
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Cidade:",
-                modifier = Modifier.weight(0.3f)
-            )
-            TextField(
-                value = cidade,
-                onValueChange = { cidade = it },
-                modifier = Modifier.weight(0.7f)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Bairro:",
-                modifier = Modifier.weight(0.3f)
-            )
-            TextField(
-                value = bairro,
-                onValueChange = { bairro = it },
-                modifier = Modifier.weight(0.7f)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Cep:",
-                modifier = Modifier.weight(0.3f)
-            )
-            TextField(
-                value = cep,
-                onValueChange = { cep = it },
-                modifier = Modifier.weight(0.7f)
-            )
+        // Lista de clientes
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            item {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Nome:", modifier = Modifier.weight(0.2f))
+                    Text(text = "Telefone:", modifier = Modifier.weight(0.2f))
+                    Text(text = "Cidade:", modifier = Modifier.weight(0.2f))
+                    Text(text = "Bairro:", modifier = Modifier.weight(0.2f))
+                    Text(text = "Cep:", modifier = Modifier.weight(0.2f))
+                }
+            }
+            items(clientes) { cliente ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = cliente["nome"] ?: "--", modifier = Modifier.weight(0.2f))
+                    Text(text = cliente["telefone"] ?: "--", modifier = Modifier.weight(0.2f))
+                    Text(text = cliente["cidade"] ?: "--", modifier = Modifier.weight(0.2f))
+                    Text(text = cliente["bairro"] ?: "--", modifier = Modifier.weight(0.2f))
+                    Text(text = cliente["cep"] ?: "--", modifier = Modifier.weight(0.2f))
+                }
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
+        // Botão para adicionar cliente
         Button(
             onClick = {
-                val city = hashMapOf(
+                val clientData = hashMapOf<String, Any>(
                     "nome" to nome,
                     "telefone" to telefone,
                     "cidade" to cidade,
                     "bairro" to bairro,
                     "cep" to cep
                 )
-                db.collection("Cidade").document("PrimeiroCliente")
-                    .set(city)
+                db.collection("Clientes").add(clientData)
                     .addOnSuccessListener {
-                        Log.d(ContentValues.TAG, "DocumentSnapshot successfully written!")
+                        Log.d("Firestore", "Cliente cadastrado com sucesso.")
+                        BuscarClientes(db) { BuscarClientes ->
+                            clientes = BuscarClientes
+                        }
                     }
                     .addOnFailureListener { e ->
-                        Log.w(ContentValues.TAG, "Error writing documento", e)
+                        Log.w("Firestore", "Erro ao cadastrar cliente", e)
                     }
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(text = "Cadastrar")
         }
+
+
     }
+}
+
+@Composable
+fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(text = label, modifier = Modifier.weight(0.3f))
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.weight(0.7f)
+        )
+    }
+}
+
+// Função para buscar clientes do Firestore
+private fun BuscarClientes(db: FirebaseFirestore, onFetch: (List<HashMap<String, String>>) -> Unit) {
+    db.collection("Clientes").get()
+        .addOnSuccessListener { documents ->
+            val clientsList = mutableListOf<HashMap<String, String>>()
+            for (document in documents) {
+                val clientData = hashMapOf<String, String>(
+                    "nome" to (document.getString("nome") ?: "--"),
+                    "telefone" to (document.getString("telefone") ?: "--"),
+                    "cidade" to (document.getString("cidade") ?: "--"),
+                    "bairro" to (document.getString("bairro") ?: "--"),
+                    "cep" to (document.getString("cep") ?: "--")
+                )
+                clientsList.add(clientData)
+                Log.d("Firestore", "${document.id} => ${document.data}")
+            }
+            onFetch(clientsList)
+        }
+        .addOnFailureListener { exception ->
+            Log.w("Firestore", "Erro ao obter documentos: ", exception)
+        }
 }
